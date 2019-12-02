@@ -83,7 +83,7 @@ std::vector<Board> getChildren(const Board &board, char player);
 int getTerminalStateValue(const Board& board);
 bool isFinalState(const Board &board);
 
-
+// returns bets possible move for the AI
 Board AlphaBetaDecision(const Board& board) {
     int maxValue = -1;
     int bestDepth = MAX;
@@ -106,9 +106,9 @@ Board AlphaBetaDecision(const Board& board) {
         }
     }
 
-    return bestBoard; // returns bets possible move for the AI
+    return bestBoard;
 }
-
+// current alpha from children
 int MaxValue(const Board& board, int alpha, int beta, int &depth) {
     depth++;
     if (isFinalState(board)) {
@@ -130,7 +130,7 @@ int MaxValue(const Board& board, int alpha, int beta, int &depth) {
 
     return best;
 }
-
+// curent beta from children
 int MinValue(const Board& board, int alpha, int beta, int &depth) {
     depth++;
     if (isFinalState(board)) {
