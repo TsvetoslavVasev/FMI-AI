@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cmath>
 #include <ctime>
+#include <random>
 
 const int valuesCount = 4;
 const int classes = 3;
@@ -98,6 +99,35 @@ struct pointComparator
     }
 };
 
+std::pair<double, double> getMinMax(std::vector<Point>& dataset,int index)
+{
+    double max = (double)INT_MIN;
+    double min = (double)INT_MAX;
+    for(int i =0 ;i < dataset.size(); i++)
+    {
+        if(min > dataset[i].values[index]) min = dataset[i].values[index];
+        if(max < dataset[i].values[index]) max = dataset[i].values[index];
+    }
+    std::pair<double, double> pair(min,max);
+    return pair;
+}
+
+void normalize(std::vector<Point>& dataset)
+{
+    std::pair<double,double> sepalLength = getMinMax(dataset, 0);
+    std::pair<double,double> sepalWidth = getMinMax(dataset, 1);
+    std::pair<double,double> petalLength = getMinMax(dataset, 2);
+    std::pair<double,double> petalWidth = getMinMax(dataset, 3);
+    
+    for(int i = 0 ;i < dataset.size(); i++)
+    {
+        dataset[i].values[0] = (dataset[i].values[0] - sepalLength.first)/(sepalLength.second - sepalLength.first);
+        dataset[i].values[1] = (dataset[i].values[1] - sepalWidth.first)/(sepalWidth.second - sepalWidth.first);
+        dataset[i].values[2] = (dataset[i].values[2] - petalLength.first)/(petalLength.second - petalLength.first);
+        dataset[i].values[3] = (dataset[i].values[3] - petalWidth.first)/(petalWidth.second - petalWidth.first);
+    }
+}
+
 void readDataset(std::vector<Point>& dataset, const char* name) {
     
     std::ifstream inputFile;
@@ -117,15 +147,75 @@ void readDataset(std::vector<Point>& dataset, const char* name) {
     }
 }
 
+int knn(Point& point, std::vector<Point>& dataset, int k)
+{
+    std::sort(dataset.begin(), dataset.end(), pointComparator(point));
+    
+    // first K-neighbours
+    std::vector<int> classesCount(classes,0);
+    for(int i = 0; i < k; i++)
+    {
+        classesCount[dataset[i].irisClass]++;
+    }
+    
+    // if several with maxOccurrences, choose the class with the nearest entry
+    std::vector<int> candidates(classes);
+    int candidatesCount = 0;
+    int maxOccurrences = -1;
+    
+    for(int i = 0; i < classes; i++)
+    {
+        if(classesCount[i] > maxOccurrences)
+        {
+            maxOccurrences = classesCount[i];
+            candidatesCount = 0;
+            candidates[candidatesCount++] = i;
+        }
+        else if (classesCount[i] == maxOccurrences) {
+            candidates[candidatesCount++] = i;
+        }
+    }
+    
+    for(int i = 0; i < k; i++)
+    {
+        if(std::find(candidates.begin(), candidates.begin() + 1, dataset[i].irisClass) != candidates.end())
+        {
+            return dataset[i].irisClass;
+        }
+    }
+    std::cout<<"Cant determine class \n";
+    return -1;
+
+}
 
 int main() {
 
     std::vector<Point> data;
-    ///Users/tsvetoslavvasev/Developer/FMI-AI/KNN/KNN
     readDataset(data, "iris.txt");
+    
+    std::random_shuffle(data.begin(), data.end());
+    
+    normalize(data);
     for(int i = 0; i<data.size();i++)
     {
         std::cout<<data[i]<<std::endl;
     }
+    std::cout<<"\n \n \n";
+    
+
+    Point point(valuesCount);
+    std::vector<double> vec{ 0.5462,0.834,0.123,0.56423};
+//    point.values[0] = 0.19;
+//    point.values[1] = 0.123;
+//    point.values[2] = 0.584;
+//    point.values[3] = 0.583;
+    point.values = vec;
+    
+    
+    int _class = knn(point,data, 3);
+    std::cout<<classToString(_class)<<std::endl;
+    
+    
+
     return 0;
 }
