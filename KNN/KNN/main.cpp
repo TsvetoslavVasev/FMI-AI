@@ -112,6 +112,20 @@ std::pair<double, double> getMinMax(std::vector<Point>& dataset,int index)
     return pair;
 }
 
+void normalzeNewPoint(std::vector<Point>& dataset, Point& point)
+{
+    std::pair<double,double> sepalLength = getMinMax(dataset, 0);
+    std::pair<double,double> sepalWidth = getMinMax(dataset, 1);
+    std::pair<double,double> petalLength = getMinMax(dataset, 2);
+    std::pair<double,double> petalWidth = getMinMax(dataset, 3);
+    
+    point.values[0] = (point.values[0] - sepalLength.first)/(sepalLength.second - sepalLength.first);
+    point.values[1] = (point.values[1] - sepalWidth.first)/(sepalWidth.second - sepalWidth.first);
+    point.values[2] = (point.values[2] - petalLength.first)/(petalLength.second - petalLength.first);
+    point.values[3] = (point.values[3] - petalWidth.first)/(petalWidth.second - petalWidth.first);
+    
+}
+
 void normalize(std::vector<Point>& dataset)
 {
     std::pair<double,double> sepalLength = getMinMax(dataset, 0);
@@ -200,20 +214,19 @@ int main() {
     {
         std::cout<<data[i]<<std::endl;
     }
-    std::cout<<"\n \n \n";
+    std::cout<<"\n \n";
     
 
     Point point(valuesCount);
-    std::vector<double> vec{ 0.5462,0.834,0.123,0.56423};
-//    point.values[0] = 0.19;
-//    point.values[1] = 0.123;
-//    point.values[2] = 0.584;
-//    point.values[3] = 0.583;
+    std::vector<double> vec{ 3.532,1.2340,1.23,3.56423};
+    
     point.values = vec;
+ 
+    normalzeNewPoint(data, point);
     
     
-    int _class = knn(point,data, 3);
-    std::cout<<classToString(_class)<<std::endl;
+    int _class = knn(point,data, 10);
+    std::cout<<classToString(_class)<<std::endl<<std::endl;
     
     
 
