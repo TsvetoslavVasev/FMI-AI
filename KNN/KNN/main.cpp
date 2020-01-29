@@ -218,7 +218,7 @@ int main() {
     
 
     Point point(valuesCount);
-    std::vector<double> vec{ 3.532,1.2340,1.23,3.56423};
+    std::vector<double> vec = {3.532,1.2340,1.23,3.56423};
     
     point.values = vec;
  
